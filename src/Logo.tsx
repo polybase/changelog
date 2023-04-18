@@ -1,24 +1,19 @@
-import * as React from "react"
 import {
-  chakra,
-  keyframes,
-  ImageProps,
-  forwardRef,
-  usePrefersReducedMotion,
-} from "@chakra-ui/react"
-import logo from "./logo.svg"
+  Box, Img, Link,
+} from '@chakra-ui/react'
+import logo from './img/logo.svg'
 
-const spin = keyframes`
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-`
+export interface LogoProps {
+  to?: string | null
+  external?: boolean
+  height?: string
+}
 
-export const Logo = forwardRef<ImageProps, "img">((props, ref) => {
-  const prefersReducedMotion = usePrefersReducedMotion()
-
-  const animation = prefersReducedMotion
-    ? undefined
-    : `${spin} infinite 20s linear`
-
-  return <chakra.img animation={animation} src={logo} ref={ref} {...props} />
-})
+export function Logo({ to, external, height = '48px' }: LogoProps) {
+  const logoEl = (
+    <Box borderRadius='md' overflow='hidden'>
+      <Img src={logo} height={height} minWidth={35} />
+    </Box>
+  )
+  return to ? <Link isExternal={external} href={to}>{logoEl}</Link> : logoEl
+}

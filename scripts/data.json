@@ -1,0 +1,290 @@
+[
+  {
+    "date": 1678224000,
+    "type": "added",
+    "desc": "Added return types to `Auth` methods",
+    "id": "0.3.34"
+  },
+  {
+    "date": 1678224000,
+    "type": "added",
+    "desc": "Added `signOut()` method, to allow apps to request the user to sign out",
+    "id": "0.3.34"
+  },
+  {
+    "date": 1678224000,
+    "type": "added",
+    "desc": "Added optional parameter `{ force: boolean }` to `signIn` method on `Auth`. If `force` is `true`, then the login popup will show to the user even if the user is already logged in.",
+    "id": "0.3.34"
+  },
+  {
+    "date": 1678224000,
+    "type": "fixed",
+    "desc": "Increased z-index of auth popup modal to max value (2147483647) to ensure it is always visible when open",
+    "id": "0.3.34"
+  },
+  {
+    "date": 1678224000,
+    "type": "fixed",
+    "desc": "Made internal `Auth` methods private",
+    "id": "0.3.34"
+  },
+  {
+    "date": 1678224000,
+    "type": "fixed",
+    "desc": "Fixed bug that caused the error handler function `.onSnapshot(successHandlerFn, errorHandlerFn)` to be called on snapshots when a request is cancelled (i.e. when all subscribers are removed).",
+    "id": "0.3.33"
+  },
+  {
+    "date": 1678051200,
+    "type": "added",
+    "desc": "Added `ethPersonalSignRecoverPublicKey(sig, msg)` to easily get a public key from a signed message.",
+    "id": "0.3.32"
+  },
+  {
+    "date": 1678051200,
+    "type": "added",
+    "desc": "Allow `origin` configuration property to be passed into `Auth`, this is require if `window.location.origin` is not available.",
+    "id": "0.3.31"
+  },
+  {
+    "date": 1677964800,
+    "type": "added",
+    "desc": "Added a new `bytes` type",
+    "id": "0.3.30"
+  },
+  {
+    "date": 1677878400,
+    "type": "added",
+    "desc": "@read and @call directives on collections that allow anyone to read or call a function in a collection",
+    "id": "0.3.29"
+  },
+  {
+    "date": 1677878400,
+    "type": "added",
+    "desc": "Array can be of Collection type",
+    "id": "0.3.29"
+  },
+  {
+    "date": 1677878400,
+    "type": "added",
+    "desc": "Array of Collection type can be used with read/call/delegate directives",
+    "id": "0.3.29"
+  },
+  {
+    "date": 1677792000,
+    "type": "fixed",
+    "desc": "Record#get, Collection#get, Query#get now signs requests on private collections",
+    "id": "0.3.28"
+  },
+  {
+    "date": 1678137600,
+    "type": "fixed",
+    "desc": "Fixed \"Failed to fetch metadata\" in the explorer",
+    "id": "0.3.26"
+  },
+  {
+    "date": 1678137600,
+    "type": "changed",
+    "desc": "The polybase-ts client libraries are now natively web-compatible",
+    "id": "0.3.26"
+  },
+  {
+    "date": 1678646400,
+    "type": "fixed",
+    "desc": "Fixed invalid dependencies in CDN bundles",
+    "id": "0.3.23"
+  },
+  {
+    "date": 1679500800,
+    "type": "added",
+    "desc": "Authorization rules using `@public`, `@read`, `@call` and `@delegate`",
+    "id": "0.3.23"
+  },
+  {
+    "date": 1679500800,
+    "type": "added",
+    "desc": "New collection interface AST that is now stored in the database. Clients do not need to parse collection code anymore",
+    "id": "0.3.23"
+  },
+  {
+    "date": 1679846400,
+    "type": "added",
+    "desc": "Authentication library `@polybase/auth`",
+    "id": "0.3.22"
+  },
+  {
+    "date": 1679846400,
+    "type": "fixed",
+    "desc": "Export types from @polybase/util",
+    "id": "0.3.22"
+  },
+  {
+    "date": 1679846400,
+    "type": "removed",
+    "desc": "Replaced lodash dependency with `Object.assign`",
+    "id": "0.3.22"
+  },
+  {
+    "date": 1680192000,
+    "type": "fixed",
+    "desc": "Fixed @polybase/client's `applySchema` not working with custom `defaultNamespace`",
+    "id": "0.3.21"
+  },
+  {
+    "date": 1680451200,
+    "type": "fixed",
+    "desc": "@polybase/client `collecton.onSnapshot(dataFn, errFn)` now supports being passed `errFn` handler as an optional second parameter",
+    "id": "0.3.20"
+  },
+  {
+    "date": 1680451200,
+    "type": "added",
+    "desc": "Added `lastRecordUpdated` and `publicKey` to `CollectionMeta` type",
+    "id": "0.3.20"
+  },
+  {
+    "date": 1680700800,
+    "type": "added",
+    "desc": "Nested fields are now indexable, you can now filter and sort by them.",
+    "id": "0.3.19"
+  },
+  {
+    "date": 1680700800,
+    "type": "fixed",
+    "desc": "@polybase/client's applySchema now re-throws errors",
+    "id": "0.3.19"
+  },
+  {
+    "date": 1681046400,
+    "type": "added",
+    "desc": "New function `Record#sign()` which signs a record using an account's private key",
+    "id": "0.3.18"
+  },
+  {
+    "date": 1681046400,
+    "type": "added",
+    "desc": "New function `Record#verify()` which verifies a signed record using an account's public key",
+    "id": "0.3.18"
+  },
+  {
+    "date": 1681305600,
+    "type": "added",
+    "desc": "New `File` record type, allowing you to store and reference files in your collections",
+    "id": "0.3.17"
+  },
+  {
+    "date": 1681305600,
+    "type": "fixed",
+    "desc": "Fixed an issue where user accounts could not be deleted",
+    "id": "0.3.17"
+  },
+  {
+    "date": 1681651200,
+    "type": "changed",
+    "desc": "Improved error handling for query failures",
+    "id": "0.3.16"
+  },
+  {
+    "date": 1681651200,
+    "type": "fixed",
+    "desc": "Fixed a bug where `Record#get()` could not handle missing records",
+    "id": "0.3.16"
+  },
+  {
+    "date": 1682160000,
+    "type": "added",
+    "desc": "Added support for the `after` and `before` parameters in pagination",
+    "id": "0.3.15"
+  },
+  {
+    "date": 1682160000,
+    "type": "fixed",
+    "desc": "Fixed an issue where the `limit` parameter was not being respected in queries",
+    "id": "0.3.15"
+  },
+  {
+    "date": 1682419200,
+    "type": "fixed",
+    "desc": "Fixed a bug causing duplicate record creation when using the `create` method",
+    "id": "0.3.14"
+  },
+  {
+    "date": 1682419200,
+    "type": "fixed",
+    "desc": "Fixed an issue where query results were not being sorted correctly",
+    "id": "0.3.14"
+  },
+  {
+    "date": 1682764800,
+    "type": "fixed",
+    "desc": "Fixed a bug causing incorrect query results when using `contains` and `containsAny`",
+    "id": "0.3.13"
+  },
+  {
+    "date": 1682764800,
+    "type": "added",
+    "desc": "Added support for the `distinct` parameter in queries",
+    "id": "0.3.13"
+  },
+  {
+    "date": 1683273600,
+    "type": "fixed",
+    "desc": "Fixed a bug causing incorrect query results when using `notContains` and `notContainsAny`",
+    "id": "0.3.12"
+  },
+  {
+    "date": 1683532800,
+    "type": "fixed",
+    "desc": "Fixed a bug causing query timeouts when using `sortBy`",
+    "id": "0.3.11"
+  },
+  {
+    "date": 1683878400,
+    "type": "added",
+    "desc": "Added support for the `count` parameter in queries",
+    "id": "0.3.10"
+  },
+  {
+    "date": 1683878400,
+    "type": "fixed",
+    "desc": "Fixed a bug causing the `delete` method to fail",
+    "id": "0.3.10"
+  },
+  {
+    "date": 1684137600,
+    "type": "fixed",
+    "desc": "Fixed a bug causing the `limit` parameter to be ignored in certain cases",
+    "id": "0.3.9"
+  },
+  {
+    "date": 1684483200,
+    "type": "fixed",
+    "desc": "Fixed a bug causing the `delete` method to fail when an index was used",
+    "id": "0.3.8"
+  },
+  {
+    "date": 1684483200,
+    "type": "fixed",
+    "desc": "Fixed a bug causing the `limit` parameter to be ignored when an index was used",
+    "id": "0.3.8"
+  },
+  {
+    "date": 1684742400,
+    "type": "fixed",
+    "desc": "Fixed a bug causing the `update` method to fail when an index was used",
+    "id": "0.3.7"
+  },
+  {
+    "date": 1684742400,
+    "type": "fixed",
+    "desc": "Fixed a bug causing the `get` method to fail when an index was used",
+    "id": "0.3.7"
+  },
+  {
+    "date": 1685088000,
+    "type": "fixed",
+    "desc": "Fixed a bug causing the `create` method to fail when an index was used",
+    "id": "0.3.6"
+  }
+]
