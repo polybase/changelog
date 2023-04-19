@@ -5,7 +5,7 @@ import importedData from './data.json'
 
 export interface JsonChange {
   id: string // 0.3.10
-  date: number
+  date: string
   type: 'added' | 'removed' | 'fixed' | 'deprecated'
   desc: string
   tags: string[]
@@ -14,6 +14,9 @@ export interface JsonChange {
 export interface Release {
   id: string
   date: number
+  major: number
+  minor: number
+  patch: number
 }
 
 export interface Change {
@@ -47,14 +50,18 @@ async function load() {
     releasesCache[change.id] = true
     releases.push({
       id: change.id,
-      date: change.date,
+      major: parseInt(change.id.split('.')[0]),
+      minor: parseInt(change.id.split('.')[1]),
+      patch: parseInt(change.id.split('.')[2]),
+      date: Math.floor((new Date(change.date)).getTime() / 1000),
     })
   })
 
   const org = db.collection('Org').record('polybase')
 
-  await Promise.all(releases.map(({ id, date }) => {
-    return db.collection('Release').create([id, org, date])
+  await Promise.all(releases.map(async ({ id, major, minor, patch, date }) => {
+    console.log('release', id)
+    return db.collection('Release').create([id, major, minor, patch, org, date])
   }))
 
   const changes = data.map((change) => ({
@@ -63,11 +70,19 @@ async function load() {
     desc: change.desc,
     tags: change.tags ?? [],
     release: db.collection('Release').record(change.id),
+    date: Math.floor((new Date(change.date)).getTime() / 1000),
   }))
 
-  await Promise.all(changes.map(({ id, release, type, desc, tags }) => {
-    return db.collection('Change').create([id, release, type, desc, tags])
-  }))
+  for (let change in changes) {
+    const { id, release, type, desc, tags, date } = changes[change]
+    console.log('change', id, release.id)
+    await db.collection('Change').create([id, release, type, desc, tags, date])
+  }
+
+  // await Promise.all(changes.map(async ({ id, release, type, desc, tags, date }) => {
+  //   console.log('change', id, release.id)
+  //   return db.collection('Change').create([id, release, type, desc, tags, date])
+  // }))
 
   return 'Data loaded'
 }
@@ -75,3 +90,4 @@ async function load() {
 load()
   .then(console.log)
   .catch(console.error)
+

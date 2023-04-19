@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Box, Container, Divider, Heading, Stack, HStack, Text, Button, Tag, Input, Spacer } from '@chakra-ui/react'
+import { Box, Container, Divider, Heading, Stack, HStack, Text, Button, Tag, Input, Spacer, IconButton } from '@chakra-ui/react'
 import {
   AutoComplete,
   AutoCompleteInput,
@@ -9,9 +9,11 @@ import {
 } from '@choc-ui/chakra-autocomplete'
 import { Logo } from './Logo'
 import { nanoid } from 'nanoid'
-import { usePolybase } from '@polybase/react'
+import { useCollection, useCollectionOnce, usePolybase } from '@polybase/react'
 import { CollectionRecord, PolybaseError } from '@polybase/client'
 import { useAuth, useIsAuthenticated } from '@polybase/react'
+import * as semver from 'semver'
+import { FaEdit, FaSkull } from 'react-icons/fa'
 
 export interface User {
   id: string
@@ -33,6 +35,7 @@ export interface Change {
   type: 'added' | 'changed' | 'fixed' | 'removed' | 'deprecated'
   desc: string
   tags: string[]
+  release: CollectionRecord<Release>
 }
 
 
@@ -50,19 +53,20 @@ export function Home() {
     (async () => {
       const publicKey = auth.state?.publicKey
       if (!isLoggedIn || !publicKey || user) return
-      const userData = await polybase.collection<User>('User').record(publicKey).get().catch(async (err) => {
-        if (err && err instanceof PolybaseError && err.reason === 'record/not-found') {
-          return polybase.collection<User>('User').create([])
-        }
-        throw err
-      })
-      setUser(polybase.collection('User').record(userData.data.id))
+      try {
+        const userData = await polybase.collection<User>('User').record(publicKey).get()
+        setUser(polybase.collection('User').record(userData.data.id))
+      } catch (e) {
+        console.log('error', e)
+      }
     })()
   }, [auth.state?.publicKey, user, isLoggedIn, polybase])
+
 
   // Create the org if it doesn't exist (once user created)
   useEffect(() => {
     if (!isLoggedIn || !user || org) return
+
     (async () => {
       const org = await polybase.collection<Org>('Org').record('polybase').get().catch(async (err) => {
         if (err && err instanceof PolybaseError && err.reason === 'record/not-found') {
@@ -78,15 +82,44 @@ export function Home() {
     id: 'v0.3.21',
   }
 
-  const releases: Release[] = [{
-    id: 'v0.3.20',
-    date: Date.now() - 1 * 1000 * 60 * 60 * 24,
-  }, {
-    id: 'v0.3.19',
-    date: Date.now() - 2 * 1000 * 60 * 60 * 24,
-  }]
+  // const releases: Release[] = [{
+  //   id: 'v0.3.20',
+  //   date: Date.now() - 1 * 1000 * 60 * 60 * 24,
+  // }, {
+  //   id: 'v0.3.19',
+  //   date: Date.now() - 2 * 1000 * 60 * 60 * 24,
+  // }]
+
+  const { data: releases, loading } = useCollection<Release>(
+    polybase.collection('Release')
+      .where('org', '==', polybase.collection('Org').record('polybase'))
+      .where('published', '==', true)
+      .sort('date', 'desc'),
+  )
+
+  const { data: preReleases } = useCollection<Release>(
+    isLoggedIn ? polybase.collection('Release')
+      .where('org', '==', polybase.collection('Org').record('polybase'))
+      .where('published', '==', false)
+      .sort('date', 'desc')
+      : null,
+  )
+
+  const lastVersion = preReleases?.data?.[0]?.data.id ?? releases?.data?.[0]?.data.id ?? '0.0.0'
+
+  const createNextRelease = (type: semver.ReleaseType) => async () => {
+    const version = semver.inc(lastVersion, type)
+    if (!version) return
+    const major = parseInt(version.split('.')[0])
+    const minor = parseInt(version.split('.')[1])
+    const patch = parseInt(version.split('.')[2])
+    await polybase.collection('Release').create([version, major, minor, patch, polybase.collection('Org').record('polybase'), Math.floor(Date.now() / 1000)])
+  }
+
 
   const isMember = !!org?.members.find((u) => u.id === user?.id)
+
+  // console.log(org?.members)
 
   return (
     <Container maxW='container.lg' p={4} pb='10em'>
@@ -126,13 +159,20 @@ export function Home() {
             <Stack>
               <Heading size='lg'>Pre-release</Heading>
               <Box>
-                <Button colorScheme='brand'>
-                  Publish {next.id}
-                </Button>
-              </Box>
-              <Box>
                 <Stack spacing={6}>
-                  <ReleaseItem key={next.id} release={next} edit />
+                  {preReleases?.data.map((release) => (
+                    <Stack key={release.data.id}>
+                      <ReleaseItem editable release={release.data} />
+                    </Stack>
+                  ))}
+                  {preReleases?.data.length === 0 && (
+                    <HStack mt={3}>
+                      <Heading size='sm'>Create Next Release</Heading>
+                      <Button onClick={createNextRelease('major')}>Major ({semver.inc(lastVersion, 'major')})</Button>
+                      <Button onClick={createNextRelease('minor')}>Minor ({semver.inc(lastVersion, 'minor')})</Button>
+                      <Button onClick={createNextRelease('patch')}>Patch ({semver.inc(lastVersion, 'patch')})</Button>
+                    </HStack>
+                  )}
                 </Stack>
               </Box>
             </Stack>
@@ -141,15 +181,15 @@ export function Home() {
             <Heading size='lg'>Releases</Heading>
             <Box>
               <Stack spacing={6}>
-                {releases.map((release) => (
-                  <ReleaseItem key={release.id} release={release} />
+                {releases?.data.map((release) => (
+                  <ReleaseItem key={release.data.id} release={release.data} />
                 ))}
               </Stack>
             </Box>
           </Stack>
         </Stack>
-      </Stack>
-    </Container>
+      </Stack >
+    </Container >
   )
 }
 
@@ -172,44 +212,47 @@ const tags = [
 
 export interface ReleaseItemsProps {
   release: Release
-  edit?: boolean
+  editable?: boolean
 }
 
-export function ReleaseItem({ release, edit }: ReleaseItemsProps) {
+export function ReleaseItem({ release, editable }: ReleaseItemsProps) {
   const [change, setChange] = useState<Change | null>(null)
+  const polybase = usePolybase()
 
-  const changes: Change[] = [{
-    id: 'v0.3.20',
-    type: 'added',
-    desc: 'Added a new feature',
-    tags: ['feature'],
-  }]
+  // const changes: Change[] = [{
+  //   id: 'v0.3.20',
+  //   type: 'added',
+  //   desc: 'Added a new feature',
+  //   tags: ['feature'],
+  // }]
+
+  const { data: changes, loading } = useCollectionOnce<Change>(
+    polybase.collection('Change')
+      .where('release', '==', polybase.collection('Release').record(release.id))
+      .sort('date', 'desc'),
+  )
 
   const { id, date } = release
-
 
   return (
     <Stack spacing={4}>
       <Stack>
         <Heading as='h2' fontSize='2xl' mt={6}>{id}</Heading>
-        {date && <Text color='bw.600'>{new Date(date).toLocaleDateString()}</Text>}
+        {editable && (
+          <Box>
+            <Button colorScheme='brand'>
+              Publish {release.id}
+            </Button>
+          </Box>
+        )}
+        {date && <Text color='bw.600'>{new Date(date * 1000).toLocaleDateString()}</Text>}
       </Stack>
       <Stack divider={<Divider />}>
-        {changes.map((change) => (
-          <HStack key={change.id}>
-            <Tag colorScheme={changeTypeColors[change.type]}>{change.type}</Tag>
-            <Box>
-              {change.desc}
-            </Box>
-            <HStack>
-              {change.tags.map((tag) => (
-                <Tag key={tag}>{tag}</Tag>
-              ))}
-            </HStack>
-          </HStack>
+        {changes?.data.map((change) => (
+          <ChangeItem editable={editable} change={change.data} />
         ))}
       </Stack>
-      {edit && !change && (
+      {editable && !change && (
         <Box>
           <Button size='sm' onClick={() => {
             setChange({
@@ -217,82 +260,154 @@ export function ReleaseItem({ release, edit }: ReleaseItemsProps) {
               type: 'added',
               desc: '',
               tags: [],
+              release: polybase.collection('Release').record(release.id),
             })
           }}>Add</Button>
         </Box>
       )}
-      {edit && change && (
-        <Stack>
-          <HStack>
-            <Tag
-              colorScheme={changeTypeColors[change.type]}
-              cursor='pointer'
-              userSelect='none'
-              onClick={() => {
-                const index = changeTypes.indexOf(change.type)
-                const next = changeTypes[(index + 1) % changeTypes.length]
-                setChange(() => ({
-                  ...change,
-                  type: next,
-                }))
-              }}>{change.type}</Tag>
-            <Input size='sm' width='50%' borderRadius='md' py='15px' />
-            <Box __css={{
-              'ul.chakra-wrap__list': {
-                flexWrap: 'nowrap',
-              },
-            }}>
-              <AutoComplete
-                openOnFocus
-                multiple
-                restoreOnBlurIfEmpty={false}
-                // value={change.tags}
-                onChange={(vals) => {
-                  setChange(() => ({
-                    ...change,
-                    tags: vals,
-                  }))
-                }}>
-                <AutoCompleteInput>
-                  {({ tags }) =>
-                    tags.map((tag, tid) => (
-                      <AutoCompleteTag
-                        key={tid}
-                        label={tag.label}
-                        onRemove={tag.onRemove}
-                      />
-                    ))
-                  }
-                </AutoCompleteInput>
-                <AutoCompleteList>
-                  {tags.map((tag, cid) => (
-                    <AutoCompleteItem
-                      key={`option-${cid}`}
-                      value={tag}
-                      _selected={{ bg: 'whiteAlpha.50' }}
-                      _focus={{ bg: 'whiteAlpha.100' }}
-                    >
-                      {tag}
-                    </AutoCompleteItem>
-                  ))}
-                </AutoCompleteList>
-              </AutoComplete>
-            </Box>
-          </HStack >
-          <HStack>
-            <Button colorScheme='brand' type='submit' size='sm' onClick={() => {
-              setChange(null)
-            }}>
-              Save
-            </Button>
-            <Button size='sm' onClick={() => {
-              setChange(null)
-            }}>Cancel</Button>
-          </HStack>
-        </Stack >
-      )
-      }
+      {editable && change && (
+        <ChangeItem create editable change={change} onDone={() => {
+          setChange(null)
+        }} />
+      )}
     </Stack >
   )
 }
 
+export interface ChangeItemProps {
+  editable?: boolean
+  create?: boolean
+  change: Change
+  onDone?: () => void
+}
+
+export function ChangeItem({ change: externalChange, create, editable, onDone }: ChangeItemProps) {
+  const [change, setChange] = useState<Change>(externalChange)
+  const [edit, setEdit] = useState(!!create)
+  const polybase = usePolybase()
+
+  useEffect(() => {
+    if (edit) return
+    setChange(externalChange)
+  }, [edit, externalChange])
+
+  const onSave = async () => {
+    const { id, type, desc, tags, release } = change
+    if (create) {
+      polybase.collection('Change').create([id, release, type, desc, tags, Math.floor(Date.now() / 1000)])
+    } else {
+      polybase.collection('Change').record(id).call('update', [type, desc, tags])
+    }
+  }
+
+  return (
+    <Stack>
+      <HStack>
+        {editable && !create && (
+          <Box>
+            <IconButton aria-label='edit' size='sm' icon={<FaEdit />} onClick={() => {
+              setEdit(true)
+            }} />
+          </Box>
+        )}
+        {editable && !create && (
+          <Box>
+            <IconButton aria-label='edit' size='sm' icon={<FaSkull />} onClick={() => {
+              polybase.collection('Change').record(change.id).call('del')
+            }} />
+          </Box>
+        )}
+        <Box minW='6em'>
+          <Tag
+            colorScheme={changeTypeColors[change.type]}
+            cursor={edit ? 'pointer' : 'default'}
+            userSelect='none'
+            onClick={() => {
+              if (!edit) return
+              const index = changeTypes.indexOf(change.type)
+              const next = changeTypes[(index + 1) % changeTypes.length]
+              setChange(() => ({
+                ...change,
+                type: next,
+              }))
+            }}>{change.type}</Tag>
+        </Box>
+        {edit ? (
+          <Input
+            value={change.desc}
+            onChange={(e) => {
+              setChange(() => ({
+                ...change,
+                desc: e.target.value,
+              }))
+            }}
+            autoFocus tabIndex={0} size='sm' width='50%' borderRadius='md' py='15px' />
+        ) : <Box>{change?.desc}</Box>}
+        {edit ? (
+          <Box __css={{
+            'ul.chakra-wrap__list': {
+              flexWrap: 'nowrap',
+            },
+          }}>
+            <AutoComplete
+              openOnFocus
+              multiple
+              restoreOnBlurIfEmpty={false}
+              value={change.tags}
+              onChange={(vals) => {
+                setChange(() => ({
+                  ...change,
+                  tags: vals,
+                }))
+              }}>
+              <AutoCompleteInput>
+                {({ tags }) =>
+                  tags.map((tag, tid) => (
+                    <AutoCompleteTag
+                      key={tid}
+                      label={tag.label}
+                      onRemove={tag.onRemove}
+                    />
+                  ))
+                }
+              </AutoCompleteInput>
+              <AutoCompleteList>
+                {tags.map((tag, cid) => (
+                  <AutoCompleteItem
+                    key={`option-${cid}`}
+                    value={tag}
+                    _selected={{ bg: 'whiteAlpha.50' }}
+                    _focus={{ bg: 'whiteAlpha.100' }}
+                  >
+                    {tag}
+                  </AutoCompleteItem>
+                ))}
+              </AutoCompleteList>
+            </AutoComplete>
+          </Box>
+        ) : (
+          <HStack>
+            {change.tags.map((tag) => (
+              <Tag key={tag}>{tag}</Tag>
+            ))}
+          </HStack>
+        )}
+      </HStack>
+      {edit ? (
+        <HStack>
+          <Button colorScheme='brand' type='submit' size='sm' onClick={() => {
+            setEdit(false)
+            onSave()
+            if (onDone) onDone()
+          }}>
+            Save
+          </Button>
+          <Button size='sm' onClick={() => {
+            setEdit(false)
+            if (onDone) onDone()
+          }}>Cancel</Button>
+        </HStack>
+      ) : null}
+    </Stack>
+  )
+}

@@ -38,23 +38,36 @@ collection Org {
 @read
 collection Release {
 	id: string;
+  major: number;
+  minor: number;
+  patch: number;
   date?: number;
   published: boolean;
 
   @delegate
   org: Org;
 
-  @index(org, id);
+  @index(org, date);
+  @index(org, [major, desc], [minor, desc], [patch, desc]);
+  @index(org, published, date);
 
-  constructor (id: string, org: Org, date?: number) {
+  constructor (id: string, major: number, minor: number, patch: number, org: Org, date?: number) {
     this.id = id;
     this.date = date;
+    this.major = major;
+    this.minor = minor;
+    this.patch = patch;
     this.org = org;
-    this.published = true;
+    this.published = false;
   }
 
   publish () {
     this.published = true;
+  }
+
+  @call(release)
+  del () {
+    selfdestruct();
   }
 }
 
@@ -65,13 +78,17 @@ collection Change {
 	desc: string;
   tags: string[];
   release: Release;
+  date?: number;
 
-  constructor (id: string, release: Release, type: string, desc: string, tags: Tag[]) {
+  @index(release, date);
+
+  constructor (id: string, release: Release, type: string, desc: string, tags?: string[], date?: number) {
     this.id = id;
     this.release = release;
     this.desc = desc;
     this.type = type;
-    this.tags = [];
+    this.tags = tags;
+    this.date = date;
   }
 
   @call(release)
@@ -83,6 +100,11 @@ collection Change {
 
   addRelease (release: Realease) {
     this.release = release;
+  }
+
+  @call(release)
+  del () {
+    selfdestruct();
   }
 }
 `
