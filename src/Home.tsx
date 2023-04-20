@@ -9,13 +9,15 @@ import {
 } from '@choc-ui/chakra-autocomplete'
 import { Logo } from './Logo'
 import { nanoid } from 'nanoid'
-import { useCollection, useCollectionOnce, usePolybase } from '@polybase/react'
+import { useCollection, usePolybase } from '@polybase/react'
 import { CollectionRecord, PolybaseError } from '@polybase/client'
 import { useAuth, useIsAuthenticated } from '@polybase/react'
 import * as semver from 'semver'
 import { FaEdit, FaSkull } from 'react-icons/fa'
 import axios from 'axios'
-import { ColorModeSwitcher } from './ColorModeSwitcher'
+import { ColorModeSwitcher } from './util/ColorModeSwitcher'
+import { useAsyncCallback } from './util/useAsyncCallback'
+import { Loading } from './util/Loading'
 
 export interface User {
   id: string
@@ -53,12 +55,11 @@ export function Home() {
   const [user, setUser] = useState<null | CollectionRecord<User>>(null)
   const [org, setOrg] = useState<null | Org>(null)
   const [commits, setCommits] = useState<Commits[]>([])
-  // const { data } = useRecord(polybase.collection('Org').record('Polybase'))
+  const [commitsLoading, setCommitsLoading] = useState<boolean>(true)
 
   const auth = useAuth()
   const [isLoggedIn] = useIsAuthenticated()
 
-  // Create the user if they don't exist
   // Create the user if they don't exist
   useEffect(() => {
     (async () => {
@@ -98,7 +99,7 @@ export function Home() {
   //   date: Date.now() - 2 * 1000 * 60 * 60 * 24,
   // }]
 
-  const { data: releases, loading } = useCollection<Release>(
+  const { data: releases, loading: releasesLoading } = useCollection<Release>(
     polybase.collection('Release')
       .where('org', '==', polybase.collection('Org').record('polybase'))
       .where('published', '==', true)
@@ -118,18 +119,19 @@ export function Home() {
     axios.get('/api/commits').then((res) => {
       setCommits(res.data)
     })
+    setCommitsLoading(false)
   }, [isMember, preReleases?.data.length])
 
   const lastVersion = preReleases?.data?.[0]?.data.id ?? releases?.data?.[0]?.data.id ?? '0.0.0'
 
-  const createNextRelease = (type: semver.ReleaseType) => async () => {
+  const createNextRelease = useAsyncCallback(async (type: semver.ReleaseType) => {
     const version = semver.inc(lastVersion, type)
     if (!version) return
     const major = parseInt(version.split('.')[0])
     const minor = parseInt(version.split('.')[1])
     const patch = parseInt(version.split('.')[2])
     await polybase.collection('Release').create([version, major, minor, patch, polybase.collection('Org').record('polybase'), Math.floor(Date.now() / 1000)])
-  }
+  })
 
   return (
     <Container maxW='container.lg' p={4} pb='10em'>
@@ -177,12 +179,14 @@ export function Home() {
                     </Stack>
                   ))}
                   {preReleases?.data.length === 0 && (
-                    <HStack mt={3}>
-                      <Heading size='sm'>Create Next Release</Heading>
-                      <Button onClick={createNextRelease('major')}>Major ({semver.inc(lastVersion, 'major')})</Button>
-                      <Button onClick={createNextRelease('minor')}>Minor ({semver.inc(lastVersion, 'minor')})</Button>
-                      <Button onClick={createNextRelease('patch')}>Patch ({semver.inc(lastVersion, 'patch')})</Button>
-                    </HStack>
+                    <Loading isLoading={createNextRelease.loading}>
+                      <HStack mt={3}>
+                        <Heading size='sm'>Create Next Release</Heading>
+                        <Button onClick={() => createNextRelease.execute('major')}>Major ({semver.inc(lastVersion, 'major')})</Button>
+                        <Button onClick={() => createNextRelease.execute('minor')}>Minor ({semver.inc(lastVersion, 'minor')})</Button>
+                        <Button onClick={() => createNextRelease.execute('patch')}>Patch ({semver.inc(lastVersion, 'patch')})</Button>
+                      </HStack>
+                    </Loading>
                   )}
                 </Stack>
               </Box>
@@ -191,31 +195,35 @@ export function Home() {
           {isMember && preReleases?.data.length && (
             <Stack>
               <Heading size='lg'>Recent commits</Heading>
-              {commits?.length > 0 ? (
-                <Stack spacing={6}>
-                  {commits.map((commit) => {
-                    return (
-                      <HStack spacing={4} key={commit.sha}>
-                        <Tag wordBreak='keep-all'>{commit.repo.split('/')[1]}</Tag>
-                        <Box>{commit.message}</Box>
-                      </HStack>
-                    )
+              <Loading isLoading={commitsLoading}>
+                {commits?.length > 0 ? (
+                  <Stack spacing={6}>
+                    {commits.map((commit) => {
+                      return (
+                        <HStack spacing={4} key={commit.sha}>
+                          <Tag wordBreak='keep-all'>{commit.repo.split('/')[1]}</Tag>
+                          <Box>{commit.message}</Box>
+                        </HStack>
+                      )
 
-                  })}
-                </Stack>
-              ) : (
-                <Box>No commits </Box>
-              )}
+                    })}
+                  </Stack>
+                ) : (
+                  <Box>No commits </Box>
+                )}
+              </Loading>
             </Stack>
           )}
           <Stack>
             <Heading size='lg'>Releases</Heading>
             <Box>
-              <Stack spacing={6}>
-                {releases?.data.map((release) => (
-                  <ReleaseItem key={release.data.id} release={release.data} />
-                ))}
-              </Stack>
+              <Loading isLoading={releasesLoading}>
+                <Stack spacing={6}>
+                  {releases?.data.map((release) => (
+                    <ReleaseItem key={release.data.id} release={release.data} />
+                  ))}
+                </Stack>
+              </Loading>
             </Box>
           </Stack>
         </Stack>
@@ -270,9 +278,9 @@ export function ReleaseItem({ release, editable }: ReleaseItemsProps) {
 
   const { id, date } = release
 
-  const publishRelease = () => {
+  const publishRelease = useAsyncCallback(() => {
     axios.post('/api/publish', { release: id })
-  }
+  })
 
   return (
     <Stack spacing={4}>
@@ -280,18 +288,20 @@ export function ReleaseItem({ release, editable }: ReleaseItemsProps) {
         <Heading as='h2' fontSize='2xl' mt={6}>{id}</Heading>
         {editable && (
           <Box>
-            <Button colorScheme='brand' onClick={publishRelease}>
+            <Button colorScheme='brand' onClick={publishRelease.execute}>
               Publish {release.id}
             </Button>
           </Box>
         )}
         {date && <Text color='bw.600'>{new Date(date * 1000).toLocaleDateString()}</Text>}
       </Stack>
-      <Stack divider={<Divider />}>
-        {changes?.data.map((change) => (
-          <ChangeItem key={change.data.id} editable={editable} change={change.data} />
-        ))}
-      </Stack>
+      <Loading isLoading={loading}>
+        <Stack divider={<Divider />}>
+          {changes?.data.map((change) => (
+            <ChangeItem key={change.data.id} editable={editable} change={change.data} />
+          ))}
+        </Stack>
+      </Loading>
       {editable && !change && (
         <Box>
           <Button size='sm' onClick={() => {
