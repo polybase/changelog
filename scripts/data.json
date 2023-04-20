@@ -1,5 +1,12 @@
 [
   {
+    "date": "2023-04-20",
+    "type": "changed",
+    "desc": "All repos on Polybase now follow consistent/shared version numbers",
+    "id": "0.5.0",
+    "tags": []
+  },
+  {
     "date": "2023-04-18",
     "type": "added",
     "desc": "`@delegate` directives now work in `@public` collections",
