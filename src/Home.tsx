@@ -58,31 +58,30 @@ export function Home() {
   const [isLoggedIn] = useIsAuthenticated()
 
   // Create the user if they don't exist
+  // Create the user if they don't exist
   useEffect(() => {
     (async () => {
       const publicKey = auth.state?.publicKey
+      console.log(publicKey, !isLoggedIn || !publicKey || user)
       if (!isLoggedIn || !publicKey || user) return
-      try {
-        const userData = await polybase.collection<User>('User').record(publicKey).get()
-        setUser(polybase.collection('User').record(userData.data.id))
-      } catch (e) {
-        console.log('error', e)
-      }
+      const userData = await polybase.collection<User>('User').record(publicKey).get().catch(async (err) => {
+        console.log(err)
+        if (err && err instanceof PolybaseError && err.reason === 'record/not-found') {
+          return polybase.collection<User>('User').create([])
+        }
+        throw err
+      })
+      setUser(polybase.collection('User').record(userData.data.id))
     })()
   }, [auth.state?.publicKey, user, isLoggedIn, polybase])
 
 
-  // Create the org if it doesn't exist (once user created)
+  // Create the org if it doesn't exist (once user created
   useEffect(() => {
     if (!isLoggedIn || !user || org) return
 
     (async () => {
-      const org = await polybase.collection<Org>('Org').record('polybase').get().catch(async (err) => {
-        if (err && err instanceof PolybaseError && err.reason === 'record/not-found') {
-          return polybase.collection<Org>('Org').create(['polybase', 'Polybase', user])
-        }
-        throw err
-      })
+      const org = await polybase.collection<Org>('Org').record('polybase').get()
       setOrg(org.data)
     })()
   }, [isLoggedIn, org, polybase, user])
