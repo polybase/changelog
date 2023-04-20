@@ -1,8 +1,8 @@
 name: Vercel Production Deployment
 
 env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: changelog
+  VERCEL_ORG_ID: team_fsDXNOvUQdDOO3MDueUAwhpW
+  VERCEL_PROJECT_ID: prj_MSXqtweKFMDWOpdkV9V5JXqDhbki
 
 on:
   release:
