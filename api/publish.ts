@@ -1,9 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-// import { secp256k1 } from '@polybase/util'
 import { wrapper } from './_wrapper'
 import { polybase } from './_polybase'
 import { createRelease } from './_github'
-// import { REPOS } from './_repos'
+import { sendMessage } from './_discord'
 
 interface Org {
   name: string
@@ -59,11 +58,12 @@ export default wrapper(async function handler(
     const changes = repoChanges[repo]
     // Create a release for the repo
     console.log('Creating release for', repo, release)
-    return createRelease('polybase', repo, release, `## ${release} - ${new Date(releaseInfo.data.date * 1000).toDateString()}\n\n${changes.map((change) => `  * ${change.type}: ${change.desc}`).join('\n\n')}`)
+    return createRelease('polybase', repo, release, `## ${release} - ${new Date(releaseInfo.data.date * 1000).toDateString()}\n\n${changes.map((change) => `* [${change.type}] ${change.desc} (${change.tags.join(', ')})`).join('\n\n')}`)
   }))
 
   // Send a notification to discord
-
+  const desc = changes.data.map((change) => `  - ${change.data.type}: ${change.data.desc}`).join('\n\n')
+  await sendMessage(`### :rocket: v${release}\n\n${desc}`).catch(() => null)
 
   // Mark as complete
   await polybase.collection('Release').record(release).call('publish', [])
