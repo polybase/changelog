@@ -130,11 +130,11 @@ async function load() {
   await db.applySchema(schema)
 
   // Create the user
-  await db.collection<User>('User').create([]).catch(() => console.log)
+  // await db.collection<User>('User').create([]).catch(() => console.log)
 
-  // Create the org
-  const pk1 = encodeToString(secp256k1.getPublicKey(decodeFromString(PRIVATE_KEY, 'hex')).slice(1), 'hex')
-  await db.collection('Org').create(['polybase', 'Polybase', db.collection('User').record(pk1)])
+  // // Create the org
+  // const pk1 = encodeToString(secp256k1.getPublicKey(decodeFromString(PRIVATE_KEY, 'hex')).slice(1), 'hex')
+  // await db.collection('Org').create(['polybase', 'Polybase', db.collection('User').record(pk1)])
 
   // Add member
   // const pk2 = '0xea448a816eba719df5155f1799d014d6ce74638fc5d42780597ad7e9df046a486ba295ed1c8364d284c416b350ba6b4e4db4966faf053e98cca6cab9fd6aa266'
