@@ -14,6 +14,7 @@ import { CollectionRecord, PolybaseError } from '@polybase/client'
 import { useAuth, useIsAuthenticated } from '@polybase/react'
 import * as semver from 'semver'
 import { FaEdit, FaSkull } from 'react-icons/fa'
+import axios from 'axios'
 
 export interface User {
   id: string
@@ -30,12 +31,19 @@ export interface Release {
   date?: number
 }
 
+export interface Commits {
+  repo: string
+  message: string
+  url: string
+  sha: string
+}
+
 export interface Change {
   id: string
   type: 'added' | 'changed' | 'fixed' | 'removed' | 'deprecated'
   desc: string
   tags: string[]
-  release: CollectionRecord<Release>
+  release?: CollectionRecord<Release>
 }
 
 
@@ -43,6 +51,7 @@ export function Home() {
   const polybase = usePolybase()
   const [user, setUser] = useState<null | CollectionRecord<User>>(null)
   const [org, setOrg] = useState<null | Org>(null)
+  const [commits, setCommits] = useState<Commits[]>([])
   // const { data } = useRecord(polybase.collection('Org').record('Polybase'))
 
   const auth = useAuth()
@@ -78,9 +87,8 @@ export function Home() {
     })()
   }, [isLoggedIn, org, polybase, user])
 
-  const next: Release = {
-    id: 'v0.3.21',
-  }
+  const isMember = !!org?.members.find((u) => u.id === user?.id)
+
 
   // const releases: Release[] = [{
   //   id: 'v0.3.20',
@@ -105,6 +113,13 @@ export function Home() {
       : null,
   )
 
+  useEffect(() => {
+    if (!isMember && preReleases?.data.length) return
+    axios.get('/api/commits').then((res) => {
+      setCommits(res.data.commits)
+    })
+  }, [isMember, preReleases?.data.length])
+
   const lastVersion = preReleases?.data?.[0]?.data.id ?? releases?.data?.[0]?.data.id ?? '0.0.0'
 
   const createNextRelease = (type: semver.ReleaseType) => async () => {
@@ -115,11 +130,6 @@ export function Home() {
     const patch = parseInt(version.split('.')[2])
     await polybase.collection('Release').create([version, major, minor, patch, polybase.collection('Org').record('polybase'), Math.floor(Date.now() / 1000)])
   }
-
-
-  const isMember = !!org?.members.find((u) => u.id === user?.id)
-
-  // console.log(org?.members)
 
   return (
     <Container maxW='container.lg' p={4} pb='10em'>
@@ -177,6 +187,36 @@ export function Home() {
               </Box>
             </Stack>
           )}
+          {isMember && (
+            <Stack>
+              <Heading size='lg'>Recent commits</Heading>
+              {preReleases?.data.length && commits ? (
+                <Stack spacing={6}>
+                  {commits.map((commit) => {
+                    const id = commit.sha
+                    const type = 'added'
+                    const desc = commit.message
+                    const tags = [commit.repo.split('/')[1]]
+                    return (
+                      <Box>
+                        <HStack>
+                          <ChangeItem change={{ id, type, desc, tags }} />
+                          <Button onClick={() => {
+                            const release = preReleases?.data[0].data.id
+                            if (!release) return
+                            polybase.collection('Change').create([nanoid(), polybase.collection('Release').record(release), type, commit.message, tags, Math.floor(Date.now() / 1000)])
+                          }}>Add</Button>
+                        </HStack>
+                      </Box>
+                    )
+
+                  })}
+                </Stack>
+              ) : (
+                <Box>No commits </Box>
+              )}
+            </Stack>
+          )}
           <Stack>
             <Heading size='lg'>Releases</Heading>
             <Box>
@@ -203,11 +243,16 @@ const changeTypeColors: Record<Change['type'], string> = {
 
 const changeTypes: Change['type'][] = ['added', 'changed', 'fixed', 'removed', 'deprecated']
 const tags = [
-  'core',
+  'polybase-rust',
+  'polybase-ts',
   'explorer',
+  'docs',
   'auth',
   'polylang',
-  'sdk',
+  'changelog',
+  'social',
+  'chat',
+  'discord-bot',
 ]
 
 export interface ReleaseItemsProps {
@@ -234,13 +279,17 @@ export function ReleaseItem({ release, editable }: ReleaseItemsProps) {
 
   const { id, date } = release
 
+  const publishRelease = () => {
+    axios.post('/api/publish', { release: id })
+  }
+
   return (
     <Stack spacing={4}>
       <Stack>
         <Heading as='h2' fontSize='2xl' mt={6}>{id}</Heading>
         {editable && (
           <Box>
-            <Button colorScheme='brand'>
+            <Button colorScheme='brand' onClick={publishRelease}>
               Publish {release.id}
             </Button>
           </Box>
@@ -293,7 +342,7 @@ export function ChangeItem({ change: externalChange, create, editable, onDone }:
 
   const onSave = async () => {
     const { id, type, desc, tags, release } = change
-    if (create) {
+    if (create && release) {
       polybase.collection('Change').create([id, release, type, desc, tags, Math.floor(Date.now() / 1000)])
     } else {
       polybase.collection('Change').record(id).call('update', [type, desc, tags])
@@ -388,7 +437,7 @@ export function ChangeItem({ change: externalChange, create, editable, onDone }:
         ) : (
           <HStack>
             {change.tags.map((tag) => (
-              <Tag key={tag}>{tag}</Tag>
+              <Tag key={tag} wordBreak='keep-all'>{tag}</Tag>
             ))}
           </HStack>
         )}

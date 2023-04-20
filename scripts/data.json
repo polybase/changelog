@@ -5,7 +5,7 @@
     "desc": "`@delegate` directives now work in `@public` collections",
     "id": "0.3.41",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   },
   {
@@ -14,7 +14,7 @@
     "desc": "Function execution now has a 5 second timeout.",
     "id": "0.3.40",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   },
   {
@@ -32,7 +32,7 @@
     "desc": "Fixed instantiating empty objects in functions, e.g. `this.meta = {}`",
     "id": "0.3.38",
     "tags": [
-      "core",
+      "polybase-rust",
       "polylang"
     ]
   },
@@ -42,7 +42,7 @@
     "desc": "Throw/log error for required/optional signer",
     "id": "0.3.37",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -51,7 +51,7 @@
     "desc": "Improved error messages when values do not match their schema types",
     "id": "0.3.37",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   },
   {
@@ -78,7 +78,7 @@
     "desc": "Collection record fields (e.g. `user: User`) are now indexable and queryable",
     "id": "0.3.36",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   },
   {
@@ -96,7 +96,7 @@
     "desc": ".push on arrays of collection records does not error anymore",
     "id": "0.3.36",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   },
   {
@@ -105,7 +105,7 @@
     "desc": "`@polybase/client`: Optional parameters are no longer type checked",
     "id": "0.3.35",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -159,7 +159,7 @@
     "desc": "`@polybase/client`: fixed bug that caused the error handler function `.onSnapshot(successHandlerFn, errorHandlerFn)` to be called on snapshots when a request is cancelled (i.e. when all subscribers are removed).",
     "id": "0.3.33",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -168,7 +168,7 @@
     "desc": "`@polybase/eth`: added `ethPersonalSignRecoverPublicKey(sig, msg)` to easily get a public key from a signed message.",
     "id": "0.3.32",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -186,7 +186,7 @@
     "desc": "Added a new `bytes` type",
     "id": "0.3.30",
     "tags": [
-      "core",
+      "polybase-rust",
       "polylang"
     ]
   },
@@ -196,7 +196,7 @@
     "desc": "@read and @call directives on collections that allow anyone to read or call a function in a collection",
     "id": "0.3.29",
     "tags": [
-      "core",
+      "polybase-rust",
       "polylang"
     ]
   },
@@ -206,7 +206,7 @@
     "desc": "Record#get, Collection#get, Query#get now signs requests on private collections",
     "id": "0.3.28",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -224,7 +224,7 @@
     "desc": "The polybase-ts client libraries are now natively web-compatible",
     "id": "0.3.26",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -233,7 +233,7 @@
     "desc": "Fixed invalid dependencies in CDN bundles",
     "id": "0.3.23",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   },
   {
@@ -242,7 +242,7 @@
     "desc": "Authorization rules using `@public`, `@read`, `@call` and `@delegate`",
     "id": "0.3.23",
     "tags": [
-      "core",
+      "polybase-rust",
       "polylang"
     ]
   },
@@ -252,8 +252,8 @@
     "desc": "New collection interface AST that is now stored in the database. Clients do not need to parse collection code anymore",
     "id": "0.3.23",
     "tags": [
-      "core",
-      "sdk"
+      "polybase-rust",
+      "polybase-ts"
     ]
   },
   {
@@ -271,7 +271,7 @@
     "desc": "Export types from @polybase/util",
     "id": "0.3.22",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -280,7 +280,7 @@
     "desc": "Replaced lodash dependency with `Object.assign`",
     "id": "0.3.22",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -289,7 +289,7 @@
     "desc": "Fixed @polybase/client's `applySchema` not working with custom `defaultNamespace`",
     "id": "0.3.21",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -298,7 +298,7 @@
     "desc": "@polybase/client `collecton.onSnapshot(dataFn, errFn)` now supports being passed `errFn` handler as an optional second parameter",
     "id": "0.3.20",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -307,7 +307,7 @@
     "desc": "Added `lastRecordUpdated` and `publicKey` to `CollectionMeta` type",
     "id": "0.3.20",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -316,7 +316,7 @@
     "desc": "Nested fields are now indexable, you can now filter and sort by them.",
     "id": "0.3.19",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   },
   {
@@ -325,7 +325,7 @@
     "desc": "@polybase/client's applySchema now re-throws errors",
     "id": "0.3.19",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -334,7 +334,7 @@
     "desc": "All fields are now indexed by default. This means that all fields can be queried and sorted without defining an explicit index",
     "id": "0.3.18",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   },
   {
@@ -352,7 +352,7 @@
     "desc": "`@unique` index support",
     "id": "0.3.18",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   },
   {
@@ -361,7 +361,7 @@
     "desc": "Fix creating a new collection with `applySchema`",
     "id": "0.3.16",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -370,7 +370,7 @@
     "desc": "Change global namespace for `@polybase/client` to `polybase` when importing using the global namespace (i.e when using a CDN). It was incorrectly set to `polybase_util`",
     "id": "0.3.15",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -406,7 +406,7 @@
     "desc": "Export minified umd format for cdn import",
     "id": "0.3.13",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -415,8 +415,8 @@
     "desc": "Update dependencies",
     "id": "0.3.12",
     "tags": [
-      "core",
-      "sdk"
+      "polybase-rust",
+      "polybase-ts"
     ]
   },
   {
@@ -425,7 +425,7 @@
     "desc": "Only call signer function (fn provided by `.signer(fn)`) for write requests (previously the signer fn was called for both read and write requests, which led to a poor user experience if using metamask to sign requests).",
     "id": "0.3.11",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -434,7 +434,7 @@
     "desc": "Added additional encryption algorithems: aes-cbc (symmetric encryption), secp256k1 (Ethereum signing/asymmetric encryption), x25519-xsalsa20-poly1305 (MetaMask encryption)",
     "id": "0.3.10",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -443,7 +443,7 @@
     "desc": "Utility fns should now be imported by algorithm name: e.g `import { aescbc, secp256k1, x25519xsalsa20poly1305 } from '@polybase/util'`",
     "id": "0.3.10",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -452,7 +452,7 @@
     "desc": "Default export of encryption functions (these fns can now be imported using the algorithm specific import - see above)",
     "id": "0.3.10",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -461,7 +461,7 @@
     "desc": "Added symmetric encryption helpers to `@polybase/util`: symmetricGenerateKey(), symmetricDecryptFromHex(), symmetricEncrypt(), symmetricDecrypt(), symmetricImportKey()",
     "id": "0.3.7",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -470,7 +470,7 @@
     "desc": "Normalized asymmetric encryption helpers in `@polybase/util`: encryptToHex() -> asymmetricEncryptToHex(), decryptFromHex() -> asymmetricDecryptFromHex()",
     "id": "0.3.7",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -479,7 +479,7 @@
     "desc": "Deprecated from `@polybase/util`: encrypt(), decrypt()",
     "id": "0.3.7",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -488,7 +488,7 @@
     "desc": "`collection.doc()` has been deprecated in favour of `collection.record()` on the `Collection` class",
     "id": "0.3.6",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -497,7 +497,7 @@
     "desc": "Doc class has been deprecated in favour of `CollectionRecord` class",
     "id": "0.3.6",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -506,7 +506,7 @@
     "desc": "The following URL endpoints have been deprecated from our hosted service",
     "id": "0.3.6",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   },
   {
@@ -515,7 +515,7 @@
     "desc": "Nomenclature for a record/document within a collection has been changed from document -> record",
     "id": "0.3.6",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -524,7 +524,7 @@
     "desc": "Error `reason` codes returned from the server have been updated",
     "id": "0.3.6",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   },
   {
@@ -533,7 +533,7 @@
     "desc": "Tests for each of the user error codes",
     "id": "0.3.6",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -542,7 +542,7 @@
     "desc": "`pk` (publicKey) is no longer accepted as the final parameter of .call(functionName, args, ~~pk~~)` and .create(args, ~~pk~~)",
     "id": "0.3.3",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -551,7 +551,7 @@
     "desc": "Signer function has new type specification",
     "id": "0.3.3",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -560,7 +560,7 @@
     "desc": "Dependencies updates",
     "id": "0.3.3",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -569,7 +569,7 @@
     "desc": "`.applySchema()` now upsert the provided code. If the collection does not exist, it is created, otherwise it is updated.",
     "id": "0.3.2",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -578,7 +578,7 @@
     "desc": "`.create()` can be called on a collection to create a new record - e.g. `db.collection('HelloWorld').create([\"id1\"])`",
     "id": "0.3.1",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -594,7 +594,7 @@
     "desc": "`doc.set()` - replaced by creating specific collection functions that can be called using `doc.call(\"fn\", args)`",
     "id": "0.3.1",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -603,7 +603,7 @@
     "desc": "`doc.delete()` - replaced by `selfdestruct()`, which should be called within a smart collection function",
     "id": "0.3.1",
     "tags": [
-      "sdk"
+      "polybase-ts"
     ]
   },
   {
@@ -621,7 +621,7 @@
     "desc": "The following URL endpoints have been deprecated from our hosted service",
     "id": "0.3.1",
     "tags": [
-      "core"
+      "polybase-rust"
     ]
   }
 ]

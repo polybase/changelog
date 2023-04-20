@@ -61,7 +61,8 @@ async function load() {
 
   await Promise.all(releases.map(async ({ id, major, minor, patch, date }) => {
     console.log('release', id)
-    return db.collection('Release').create([id, major, minor, patch, org, date])
+    await db.collection('Release').create([id, major, minor, patch, org, date])
+    await db.collection('Release').record(id).call('publish')
   }))
 
   const changes = data.map((change) => ({
@@ -79,6 +80,7 @@ async function load() {
     await db.collection('Change').create([id, release, type, desc, tags, date])
   }
 
+  // BROKEN
   // await Promise.all(changes.map(async ({ id, release, type, desc, tags, date }) => {
   //   console.log('change', id, release.id)
   //   return db.collection('Change').create([id, release, type, desc, tags, date])

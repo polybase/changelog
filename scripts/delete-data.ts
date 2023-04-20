@@ -17,12 +17,12 @@ async function load() {
     throw new Error('No private key provided')
   }
 
+  // MUST DELETE CHANGES FIRST (otherwise permissions won't work)
+  const changes = await db.collection('Change').get()
+  await Promise.all(changes.data.map((change) => db.collection('Change').record(change.data.id).call('del').catch(() => null)))
+
   const releases = await db.collection('Release').get()
   await Promise.all(releases.data.map((release) => db.collection('Release').record(release.data.id).call('del')))
-
-  const changes = await db.collection('Change').get()
-  await Promise.all(changes.data.map((change) => db.collection('Change').record(change.data.id).call('del')))
-
 
   return 'Data deleted'
 }

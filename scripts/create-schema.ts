@@ -23,10 +23,10 @@ collection Org {
   @delegate
   members: User[];
 
-  constructor (id: string, name: string, member: User) {
+  constructor (id: string, name: string, members: User[]) {
     this.id = id;
     this.name = name;
-    this.members = [member];
+    this.members = members;
   }
 
   @call(members)
@@ -61,11 +61,12 @@ collection Release {
     this.published = false;
   }
 
+  @call(org)
   publish () {
     this.published = true;
   }
 
-  @call(release)
+  @call(org)
   del () {
     selfdestruct();
   }
@@ -98,10 +99,6 @@ collection Change {
     this.tags = tags;
   }
 
-  addRelease (release: Realease) {
-    this.release = release;
-  }
-
   @call(release)
   del () {
     selfdestruct();
@@ -126,14 +123,6 @@ async function load() {
   }
 
   await db.applySchema(schema)
-
-  // await db.collection('User').create([])
-  // await db.collection('Org').create([
-  //   'polybase',
-  //   'Polybase',
-  //   db.collection('User')
-  //     .record('0x4cb3281be4f42b80966b7b86bbb99e56e8a7729975af16ba492d82dcc0e41a5b746bee51a3ab9b6e9045d385e482c9bedd5ab7777f594ffd1c76ee82f1ce9b25'),
-  // ])
 
   return 'Schema loaded'
 }
