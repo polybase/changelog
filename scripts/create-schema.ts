@@ -23,10 +23,10 @@ collection Org {
   @delegate
   members: User[];
 
-  constructor (id: string, name: string, members: User[]) {
+  constructor (id: string, name: string, member: User) {
     this.id = id;
     this.name = name;
-    this.members = members;
+    this.members = [member];
   }
 
   @call(members)
