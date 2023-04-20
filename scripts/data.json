@@ -69,7 +69,8 @@
     "desc": "Auth listener .onAuthUpdate is now not called until loading completes, so the first message received is the true auth (signed in/out) state",
     "id": "0.3.37",
     "tags": [
-      "auth"
+      "auth",
+      "polybase-ts"
     ]
   },
   {
@@ -87,7 +88,7 @@
     "desc": "Added react helpers for auth `AuthProvider()`, `useAuth()` and `useIsAuthenticated()`",
     "id": "0.3.36",
     "tags": [
-      "auth"
+      "polybase-ts"
     ]
   },
   {
@@ -114,7 +115,7 @@
     "desc": "`@polybase/auth`: Added return types to `Auth` methods",
     "id": "0.3.34",
     "tags": [
-      "auth"
+      "polybase-ts"
     ]
   },
   {
@@ -123,7 +124,8 @@
     "desc": "`@polybase/auth`: Added `signOut()` method, to allow apps to request the user to sign out",
     "id": "0.3.34",
     "tags": [
-      "auth"
+      "auth",
+      "polybase-ts"
     ]
   },
   {
@@ -132,6 +134,7 @@
     "desc": "`@polybase/auth`: Added optional parameter `{ force: boolean }` to `signIn` method on `Auth`. If `force` is `true`, then the login popup will show to the user even if the user is already logged in.",
     "id": "0.3.34",
     "tags": [
+      "polybase-ts",
       "auth"
     ]
   },
@@ -141,7 +144,7 @@
     "desc": "`@polybase/auth`: increased z-index of auth popup modal to max value (2147483647) to ensure it is always visible when open",
     "id": "0.3.34",
     "tags": [
-      "auth"
+      "polybase-ts"
     ]
   },
   {
@@ -150,7 +153,7 @@
     "desc": "`@polybase/auth`: made internal `Auth` methods private",
     "id": "0.3.34",
     "tags": [
-      "auth"
+      "polybase-ts"
     ]
   },
   {
@@ -177,7 +180,8 @@
     "desc": "`@polybase/auth`: Allow `origin` configuration property to be passed into `Auth`, this is require if `window.location.origin` is not available.",
     "id": "0.3.31",
     "tags": [
-      "auth"
+      "auth",
+      "polybase-ts"
     ]
   },
   {
@@ -262,7 +266,8 @@
     "desc": "Authentication library `@polybase/auth`",
     "id": "0.3.22",
     "tags": [
-      "auth"
+      "auth",
+      "polybase-ts"
     ]
   },
   {
