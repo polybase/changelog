@@ -15,6 +15,7 @@ import { useAuth, useIsAuthenticated } from '@polybase/react'
 import * as semver from 'semver'
 import { FaEdit, FaSkull } from 'react-icons/fa'
 import axios from 'axios'
+import { ColorModeSwitcher } from './ColorModeSwitcher'
 
 export interface User {
   id: string
@@ -139,6 +140,7 @@ export function Home() {
             <Heading as='h1' size='lg'>The Changelog</Heading>
             <Spacer />
             <HStack>
+              <ColorModeSwitcher />
               {isMember && (
                 <Button
                   onClick={async () => {
