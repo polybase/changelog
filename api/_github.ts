@@ -65,7 +65,7 @@ export const findCommitsSinceLastRelease = async (
   const octokit = new Octokit({ auth: GITHUB_PERSONAL_ACCESS_TOKEN })
   const commits: Commit[] = []
 
-  for (const repo of repos) {
+  await Promise.all(repos.map(async (repo) => {
     const [owner, repoName] = repo.split('/')
 
     const releasesResponse = await octokit.rest.repos.listReleases({
@@ -87,8 +87,6 @@ export const findCommitsSinceLastRelease = async (
       ? new Date(release.published_at)
       : new Date()
 
-    console.log(repo, latestReleaseDate)
-
     const commitsResponse = await octokit.rest.repos.listCommits({
       owner,
       repo: repoName,
@@ -102,11 +100,11 @@ export const findCommitsSinceLastRelease = async (
         message: commitData.commit.message,
         url: commitData.html_url,
       }
-      // if (commit.message !== release.name) {
-      commits.push(commit)
-      // }
+      if (commit.message !== release.name) {
+        commits.push(commit)
+      }
     }
-  }
+  }))
 
   return commits
 }

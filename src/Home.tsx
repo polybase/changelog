@@ -114,11 +114,11 @@ export function Home() {
   )
 
   useEffect(() => {
-    if (!isMember && preReleases?.data.length) return
+    if (!isMember || preReleases?.data.length) return
     axios.get('/api/commits').then((res) => {
       setCommits(res.data.commits)
     })
-  }, [isMember, preReleases?.data.length])
+  }, [commits, isMember, preReleases?.data.length])
 
   const lastVersion = preReleases?.data?.[0]?.data.id ?? releases?.data?.[0]?.data.id ?? '0.0.0'
 
@@ -187,7 +187,7 @@ export function Home() {
               </Box>
             </Stack>
           )}
-          {isMember && (
+          {isMember && preReleases?.data.length && (
             <Stack>
               <Heading size='lg'>Recent commits</Heading>
               {preReleases?.data.length && commits ? (
@@ -298,7 +298,7 @@ export function ReleaseItem({ release, editable }: ReleaseItemsProps) {
       </Stack>
       <Stack divider={<Divider />}>
         {changes?.data.map((change) => (
-          <ChangeItem editable={editable} change={change.data} />
+          <ChangeItem key={change.data.id} editable={editable} change={change.data} />
         ))}
       </Stack>
       {editable && !change && (
