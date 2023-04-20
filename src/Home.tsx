@@ -114,11 +114,11 @@ export function Home() {
   )
 
   useEffect(() => {
-    if (!isMember || preReleases?.data.length) return
+    if (!isMember || !preReleases?.data.length) return
     axios.get('/api/commits').then((res) => {
-      setCommits(res.data.commits)
+      setCommits(res.data)
     })
-  }, [commits, isMember, preReleases?.data.length])
+  }, [isMember, preReleases?.data.length])
 
   const lastVersion = preReleases?.data?.[0]?.data.id ?? releases?.data?.[0]?.data.id ?? '0.0.0'
 
@@ -190,24 +190,14 @@ export function Home() {
           {isMember && preReleases?.data.length && (
             <Stack>
               <Heading size='lg'>Recent commits</Heading>
-              {preReleases?.data.length && commits ? (
+              {commits?.length > 0 ? (
                 <Stack spacing={6}>
                   {commits.map((commit) => {
-                    const id = commit.sha
-                    const type = 'added'
-                    const desc = commit.message
-                    const tags = [commit.repo.split('/')[1]]
                     return (
-                      <Box>
-                        <HStack>
-                          <ChangeItem change={{ id, type, desc, tags }} />
-                          <Button onClick={() => {
-                            const release = preReleases?.data[0].data.id
-                            if (!release) return
-                            polybase.collection('Change').create([nanoid(), polybase.collection('Release').record(release), type, commit.message, tags, Math.floor(Date.now() / 1000)])
-                          }}>Add</Button>
-                        </HStack>
-                      </Box>
+                      <HStack spacing={4} key={commit.sha}>
+                        <Tag wordBreak='keep-all'>{commit.repo.split('/')[1]}</Tag>
+                        <Box>{commit.message}</Box>
+                      </HStack>
                     )
 
                   })}
@@ -271,7 +261,7 @@ export function ReleaseItem({ release, editable }: ReleaseItemsProps) {
   //   tags: ['feature'],
   // }]
 
-  const { data: changes, loading } = useCollectionOnce<Change>(
+  const { data: changes, loading } = useCollection<Change>(
     polybase.collection('Change')
       .where('release', '==', polybase.collection('Release').record(release.id))
       .sort('date', 'desc'),

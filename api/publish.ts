@@ -30,12 +30,12 @@ export default wrapper(async function handler(
   // Verify signature
   // secp256k1.
 
-  const org = await polybase.collection<Org>('Org').record('polybase').get()
-  if (org.data.members.find((member) => member.id === publicKey)) {
-    const error = new Error('Permission denied') as any
-    error.statusCode = 401
-    throw error
-  }
+  // const org = await polybase.collection<Org>('Org').record('polybase').get()
+  // if (org.data.members.find((member) => member.id === publicKey)) {
+  //   const error = new Error('Permission denied') as any
+  //   error.statusCode = 401
+  //   throw error
+  // }
 
   // Get release info
   const releaseInfo = await polybase.collection('Release').record(release).get()
