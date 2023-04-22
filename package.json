@@ -2,6 +2,7 @@
   "name": "@polybase/changelog",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://polybase.xyz/changelog",
   "dependencies": {
     "@chakra-ui/react": "^2.5.5",
     "@choc-ui/chakra-autocomplete": "^5.1.4",
