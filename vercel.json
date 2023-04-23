@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/changelog/:path*",
+      "destination": "/:path*"
+    }
+  ]
+}
