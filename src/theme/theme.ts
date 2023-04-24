@@ -28,7 +28,7 @@ const theme = extendTheme({
         backgroundColor: props.colorMode === 'dark' ? '#0F1117' : '#fff',
         backgroundPosition: 'top right',
         backgroundAttachment: 'fixed',
-        backgroundImage: 'url(background.png)',
+        backgroundImage: 'url(/changelog/background.png)',
         backgroundRepeat: 'no-repeat',
       },
     }),

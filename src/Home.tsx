@@ -116,7 +116,7 @@ export function Home() {
 
   useEffect(() => {
     if (!isMember || !preReleases?.data.length) return
-    axios.get('/api/commits').then((res) => {
+    axios.get('/changelog/api/commits').then((res) => {
       setCommits(res.data)
     })
     setCommitsLoading(false)
