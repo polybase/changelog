@@ -279,7 +279,7 @@ export function ReleaseItem({ release, editable }: ReleaseItemsProps) {
   const { id, date } = release
 
   const publishRelease = useAsyncCallback(() => {
-    axios.post('/api/publish', { release: id })
+    axios.post('/changelog/api/publish', { release: id })
   })
 
   return (
