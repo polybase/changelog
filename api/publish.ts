@@ -63,7 +63,7 @@ export default wrapper(async function handler(
 
   // Send a notification to discord
   const desc = changes.data.map((change) => `  - ${change.data.type}: ${change.data.desc}`).join('\n\n')
-  await sendMessage(`### :rocket: v${release}\n\n${desc}`).catch(() => null)
+  await sendMessage(`:rocket: v${release}\n\n${desc}`).catch(() => null)
 
   // Mark as complete
   await polybase.collection('Release').record(release).call('publish', [])
