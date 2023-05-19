@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { wrapper } from './_wrapper'
 import { polybase } from './_polybase'
-import { createBranch } from './_github'
+import { sendMessage } from './_discord'
 import { Change } from './_types'
 
 export default wrapper(async function handler(
@@ -10,22 +10,11 @@ export default wrapper(async function handler(
 ): Promise<VercelResponse> {
   // Body parameters
   const release = request.body.release as string
-  const publicKey = request.body.publicKey as string
-  const sig = request.body.sig as string
-
-  // Verify signature
-  // secp256k1.
-
-  // const org = await polybase.collection<Org>('Org').record('polybase').get()
-  // if (org.data.members.find((member) => member.id === publicKey)) {
-  //   const error = new Error('Permission denied') as any
-  //   error.statusCode = 401
-  //   throw error
-  // }
 
   // Get release info
   const releaseInfo = await polybase.collection('Release').record(release).get()
 
+  // Check release exists
   if (!releaseInfo.data) {
     throw new Error('Release does not exist')
   }
@@ -44,13 +33,12 @@ export default wrapper(async function handler(
     })
   })
 
-  // Create a release for each repo
-  await Promise.all(Object.keys(repoChanges).map((repo) => {
-    // Create a release PR for the repo
-    console.log('Creating release branch for', repo, release)
-    return createBranch('polybase', repo, `release-${release}`).catch(() => null)
-  }))
+  // Send a notification to discord
+  const desc = changes.data.map((change) => `  - ${change.data.type}: ${change.data.desc} [${change.data.tags?.join(', ')}]`).join('\n\n')
+  await sendMessage(`:rocket: v${release}\n\n${desc}`).catch(() => null)
 
+  // Mark as complete
+  await polybase.collection('Release').record(release).call('publish', [])
 
   return response.json({
     status: 'OK',

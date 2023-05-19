@@ -282,16 +282,23 @@ export function ReleaseItem({ release, editable }: ReleaseItemsProps) {
     axios.post('/changelog/api/publish', { release: id })
   })
 
+  const finaliseRelease = useAsyncCallback(() => {
+    axios.post('/changelog/api/finalise', { release: id })
+  })
+
   return (
     <Stack spacing={4}>
       <Stack>
         <Heading as='h2' fontSize='2xl' mt={6}>{id}</Heading>
         {editable && (
-          <Box>
-            <Button colorScheme='brand' onClick={publishRelease.execute}>
+          <HStack>
+            <Button colorScheme='brand' onClick={publishRelease.execute} isLoading={publishRelease.loading}>
               Publish {release.id}
             </Button>
-          </Box>
+            <Button colorScheme='brand' onClick={finaliseRelease.execute} isLoading={finaliseRelease.loading}>
+              Finalise {release.id}
+            </Button>
+          </HStack>
         )}
         {date && <Text color='bw.600'>{new Date(date * 1000).toLocaleDateString()}</Text>}
       </Stack>

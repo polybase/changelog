@@ -52,6 +52,32 @@ export const createRelease = async (
   return releaseResponse.data.html_url
 }
 
+export const createBranch = async (
+  owner: string,
+  repo: string,
+  newBranch: string,
+) => {
+  const octokit = new Octokit({ auth: GITHUB_PERSONAL_ACCESS_TOKEN })
+
+  // Get the latest commit on the main branch
+  const branchResponse = await octokit.rest.repos.getBranch({
+    owner,
+    repo,
+    branch: 'main',
+  })
+  const commitSha = branchResponse.data.commit.sha
+
+  // Create a new branch reference point to the latest commit on the main branch
+  await octokit.rest.git.createRef({
+    owner,
+    repo,
+    ref: `refs/heads/${newBranch}`,
+    sha: commitSha,
+  })
+
+  return commitSha
+}
+
 interface Commit {
   repo: string
   message: string
