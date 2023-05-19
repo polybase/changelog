@@ -52,16 +52,16 @@ jobs:
         run: |
           git push origin HEAD:release --tags
 
-      - name: "Create Release"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          curl --request POST \
-          --url https://api.github.com/repos/${{ github.repository }}/releases \
-          --header "Authorization: Bearer $GITHUB_TOKEN" \
-          --header 'Content-Type: application/json' \
-          --data '{
-            "tag_name": "$PR_VERSION",
-            "name": "Release $PR_VERSION",
-            "body": "Release notes for version $PR_VERSION"
-          }'
+          - name: "Create Release"
+          env:
+            GITHUB_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+          run: |
+            curl --request POST \
+            --url https://api.github.com/repos/${{ github.repository }}/releases \
+            --header "Authorization: Bearer $GITHUB_TOKEN" \
+            --header 'Content-Type: application/json' \
+            --data "{
+              \"tag_name\": \"$PR_VERSION\",
+              \"name\": \"Release $PR_VERSION\",
+              \"body\": \"Release notes for version $PR_VERSION\"
+            }"
