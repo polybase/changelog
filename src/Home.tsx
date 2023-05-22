@@ -64,7 +64,6 @@ export function Home() {
   useEffect(() => {
     (async () => {
       const publicKey = auth.state?.publicKey
-      console.log(publicKey, !isLoggedIn || !publicKey || user)
       if (!isLoggedIn || !publicKey || user) return
       const userData = await polybase.collection<User>('User').record(publicKey).get().catch(async (err) => {
         console.log(err)
@@ -73,7 +72,9 @@ export function Home() {
         }
         throw err
       })
-      setUser(polybase.collection('User').record(userData.data.id))
+      const userId = userData?.data?.id
+      if (!userId) return
+      setUser(polybase.collection('User').record(userId))
     })()
   }, [auth.state?.publicKey, user, isLoggedIn, polybase])
 
