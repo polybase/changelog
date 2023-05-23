@@ -65,13 +65,10 @@ export function Home() {
     (async () => {
       const publicKey = auth.state?.publicKey
       if (!isLoggedIn || !publicKey || user) return
-      const userData = await polybase.collection<User>('User').record(publicKey).get().catch(async (err) => {
-        console.log(err)
-        if (err && err instanceof PolybaseError && err.reason === 'record/not-found') {
-          return polybase.collection<User>('User').create([])
-        }
-        throw err
-      })
+      let userData = await polybase.collection<User>('User').record(publicKey).get()
+      if (!userData.exists()) {
+        userData = await polybase.collection<User>('User').create([])
+      }
       const userId = userData?.data?.id
       if (!userId) return
       setUser(polybase.collection('User').record(userId))
@@ -90,7 +87,6 @@ export function Home() {
   }, [isLoggedIn, org, polybase, user])
 
   const isMember = !!org?.members.find((u) => u.id === user?.id)
-
 
   // const releases: Release[] = [{
   //   id: 'v0.3.20',
