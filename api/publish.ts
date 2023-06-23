@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { wrapper } from './_wrapper'
 import { polybase } from './_polybase'
-import { createBranch } from './_github'
-import { Change } from './_types'
+import { createBranch, findReposWithCommitsSinceLastRelease } from './_github'
+import { REPOS } from './_repos'
 
 export default wrapper(async function handler(
   request: VercelRequest,
@@ -10,8 +10,8 @@ export default wrapper(async function handler(
 ): Promise<VercelResponse> {
   // Body parameters
   const release = request.body.release as string
-  const publicKey = request.body.publicKey as string
-  const sig = request.body.sig as string
+  // const publicKey = request.body.publicKey as string
+  // const sig = request.body.sig as string
 
   // Verify signature
   // secp256k1.
@@ -30,22 +30,11 @@ export default wrapper(async function handler(
     throw new Error('Release does not exist')
   }
 
-  // Get the list of changes for the release
-  const changes = await polybase.collection<Change>('Change')
-    .where('release', '==', polybase.collection('Release').record(release))
-    .get()
+  // Create a release for each repo that has a commit since the last release
+  const repoChanges = await findReposWithCommitsSinceLastRelease(REPOS)
 
   // Create a release for each repo
-  const repoChanges: Record<string, Change[]> = {}
-  changes.data.forEach((change) => {
-    change.data.tags.forEach((tag) => {
-      if (!repoChanges[tag]) repoChanges[tag] = []
-      repoChanges[tag].push(change.data)
-    })
-  })
-
-  // Create a release for each repo
-  await Promise.all(Object.keys(repoChanges).map((repo) => {
+  await Promise.all(repoChanges.map((repo) => {
     // Create a release PR for the repo
     console.log('Creating release branch for', repo, release)
     return createBranch('polybase', repo, `release-${release}`).catch(() => null)
