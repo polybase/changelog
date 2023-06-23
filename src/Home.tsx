@@ -279,12 +279,12 @@ export function ReleaseItem({ release, editable }: ReleaseItemsProps) {
 
   const { id, date } = release
 
-  const publishRelease = useAsyncCallback(() => {
-    axios.post('/changelog/api/publish', { release: id })
+  const publishRelease = useAsyncCallback(async () => {
+    await axios.post('/changelog/api/publish', { release: id })
   })
 
-  const finaliseRelease = useAsyncCallback(() => {
-    axios.post('/changelog/api/finalise', { release: id })
+  const finaliseRelease = useAsyncCallback(async () => {
+    await axios.post('/changelog/api/finalise', { release: id })
   })
 
   return (

@@ -134,3 +134,11 @@ export const findCommitsSinceLastRelease = async (
 
   return commits
 }
+
+export const findReposWithCommitsSinceLastRelease = async (
+  repos: string[],
+): Promise<string[]> => {
+  const commits = await findCommitsSinceLastRelease(repos)
+  const reposWithCommits = commits.map((commit) => commit.repo)
+  return [...new Set(reposWithCommits)]
+}
