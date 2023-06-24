@@ -34,10 +34,11 @@ export default wrapper(async function handler(
   const repoChanges = await findReposWithCommitsSinceLastRelease(REPOS)
 
   // Create a release for each repo
-  await Promise.all(repoChanges.map((repo) => {
+  await Promise.all(repoChanges.map((repoPath) => {
     // Create a release PR for the repo
-    console.log('Creating release branch for', repo, release)
-    return createBranch('polybase', repo, `release-${release}`).catch(() => null)
+    console.log('Creating release branch for', repoPath, release)
+    const [owner, repo] = repoPath.split('/')
+    return createBranch(owner, repo, `release-${release}`).catch((e) => console.error(e))
   }))
 
 
