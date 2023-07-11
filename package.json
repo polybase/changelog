@@ -1,8 +1,19 @@
 {
   "name": "@polybase/changelog",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "private": true,
   "homepage": "https://polybase.xyz/changelog",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "pull:dev": "vercel env pull .env --environment development",
+    "pull:preview": "vercel env pull .env --environment preview",
+    "pull:prod": "vercel env pull .env --environment production",
+    "load": "ts-node ./scripts/create-schema.ts",
+    "env": "env-cmd --no-override --file ${ENV_PATH:-.env}"
+  },
   "dependencies": {
     "@chakra-ui/react": "^2.5.5",
     "@choc-ui/chakra-autocomplete": "^5.1.4",
@@ -10,10 +21,10 @@
     "@emotion/styled": "^11.0.0",
     "@octokit/rest": "^19.0.7",
     "@polybase/auth": "^0.6.1",
-    "@polybase/client": "^0.6.1",
-    "@polybase/eth": "^0.6.1",
-    "@polybase/react": "^0.6.1",
-    "@polybase/util": "^0.6.1",
+    "@polybase/client": "^0.6.3-beta.385",
+    "@polybase/eth": "^0.6.3-beta.385",
+    "@polybase/react": "^0.6.3-beta.385",
+    "@polybase/util": "^0.6.3-beta.385",
     "@sentry/react": "^7.48.0",
     "@sentry/tracing": "^7.48.0",
     "@testing-library/jest-dom": "^5.16.4",
@@ -37,17 +48,6 @@
     "typescript": "^5.0.4",
     "util": "^0.12.5",
     "web-vitals": "^3.3.1"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "pull:dev": "vercel env pull --environment development",
-    "pull:preview": "vercel env pull --environment preview",
-    "pull:prod": "vercel env pull --environment production",
-    "load": "ts-node ./scripts/create-schema.ts",
-    "env": "env-cmd --no-override --file ${ENV_PATH:-.env}"
   },
   "eslintConfig": {
     "extends": [
